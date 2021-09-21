@@ -1,15 +1,15 @@
 # blockchain-developer-bootcamp-final-project
 
+Event Ticketing
 
-The Vault
+This dapp will be a smart contract that allows people to purchase event tickets. There will be functionality for event organizers to create events + tickets and for customers to buy tickets for the events.
 
-I originally had the idea of building a dapp that encouraged long-term NFT holding where a user would lock their NFT in a "vault" and they'd receive an ERC-20 token in return based on how long they decided to lock up their NFT.
+Workflow - Event Organizer:
+1. Register as an event organizer
+2. Create an event and ticket
+3. Withdraw available funds after sale ends
 
-But for the sake of keeping it simple, I decided to scrap the ERC-20 token reward for now. I may also simplify further by just using ETH deposits rather than an NFT.
-
-
-Workflow:
-1. Connect a wallet to the dapp
-2. Decide on the lock up period and the asset to deposit
-3. Deposit asset into the smart contract
-4. Withdraw asset after the lock up period ends
+Workflow - Attendee
+1. Register as an attendee
+2. Select and purchase tickeet
+3. Refund ticket if desired
