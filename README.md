@@ -6,8 +6,7 @@ This dapp will be a smart contract that allows people to purchase event tickets.
 
 Workflow - Attendee(Buyer):
 1. Register as an attendee
-2. Select and purchase tickeet
-3. Refund ticket if desired
+2. Select and purchase ticket
 
 
 Workflow - Event Organizer(Seller):
