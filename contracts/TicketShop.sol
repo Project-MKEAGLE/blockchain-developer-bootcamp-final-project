@@ -26,6 +26,11 @@ contract TicketShop {
   mapping (uint => Event) events;
   mapping (address => mapping(uint => uint)) tickets;
 
+  event BuyerRegistered(address buyer);
+  event SellerRegistered(address seller);
+  event EventAdded(uint eventId, address seller);
+  event TicketSold(uint eventId, address buyer, uint value);
+
   modifier onlyBuyer(address _buyer) {
     require(isBuyer[_buyer] == true, "Not registered as a buyer");
     _;
@@ -39,18 +44,20 @@ contract TicketShop {
   // Registers the user as a buyer
   function registerBuyer() external {
     isBuyer[msg.sender] = true;
+
+    emit BuyerRegistered(msg.sender);
   }
 
   // Registers the user as a seller
   function registerSeller() external {
     isSeller[msg.sender] = true;
+
+    emit SellerRegistered(msg.sender);
   }
 
   // Allows a seller to create an event
   function createEvent(string memory _name, uint _price, uint _supply) external onlySeller(msg.sender) {
-    uint eventId = eventCount;
-
-    events[eventId] = Event({
+    events[eventCount] = Event({
       name: _name,
       seller: payable(msg.sender),
       price: _price,
@@ -61,6 +68,8 @@ contract TicketShop {
       soldOut: false
     });
 
+    emit EventAdded(eventCount, msg.sender);
+
     eventCount++;
   }
 
@@ -70,6 +79,7 @@ contract TicketShop {
     require(tickets[msg.sender][_eventId] < 1, "You've already purchased a ticket");
     require(events[_eventId].soldOut == false, "This event is sold out");
     require(block.timestamp < events[_eventId].saleEnd, "This sale has closed");
+    require(msg.value >= events[_eventId].price, "Insufficient transaction value");
 
     tickets[msg.sender][_eventId] = 1;
 
@@ -79,8 +89,10 @@ contract TicketShop {
       events[_eventId].soldOut = true;
     }
 
-    (bool success, ) = events[_eventId].seller.call{value: msg.value}("");
+    (bool success, ) = events[_eventId].seller.call{value: events[_eventId].price}("");
       require(success, "Transfer failed.");
+
+    emit TicketSold(_eventId, msg.sender, msg.value);
   }
 }
 
