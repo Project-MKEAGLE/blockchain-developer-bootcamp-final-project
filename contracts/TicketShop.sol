@@ -20,14 +20,14 @@ contract TicketShop {
 
   uint public eventCount;
 
-  mapping (address => bool) isBuyer;
-  mapping (address => bool) isSeller;
-  mapping (address => uint) balances;
-  mapping (uint => Event) events;
-  mapping (address => mapping(uint => uint)) tickets;
+  mapping (address => bool) public isBuyer;
+  mapping (address => bool) public isSeller;
+  mapping (address => uint) public balances;
+  mapping (uint => Event) public events;
+  mapping (address => mapping(uint => uint)) public tickets;
 
-  event BuyerRegistered(address buyer);
-  event SellerRegistered(address seller);
+  event BuyerRegistered(address buyer, bool status);
+  event SellerRegistered(address seller, bool status);
   event EventAdded(uint eventId, address seller);
   event TicketSold(uint eventId, address buyer, uint value);
 
@@ -43,16 +43,20 @@ contract TicketShop {
 
   // Registers the user as a buyer
   function registerBuyer() external {
+    require(isBuyer[msg.sender] != true, "Already registered");
+
     isBuyer[msg.sender] = true;
 
-    emit BuyerRegistered(msg.sender);
+    emit BuyerRegistered(msg.sender, isBuyer[msg.sender]);
   }
 
   // Registers the user as a seller
   function registerSeller() external {
+    require(isSeller[msg.sender] != true, "Already registered");
+    
     isSeller[msg.sender] = true;
 
-    emit SellerRegistered(msg.sender);
+    emit SellerRegistered(msg.sender, isSeller[msg.sender]);
   }
 
   // Allows a seller to create an event
