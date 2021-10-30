@@ -1,10 +1,12 @@
 const TicketShop = artifacts.require("TicketShop");
-let BN = web3.utils.BN;
+let BN = web3.utils.BN
 
 contract("TicketShop", async (accounts) => {
-    const [buyer, seller] = accounts;
-    const price = "100"
-    const excessAmount = "200"
+    const [buyer, seller, unregistered] = accounts;
+    const name = "test"
+    const price = 100
+    const supply = 200
+    const excessAmount = 200
 
     let ts;
 
@@ -19,20 +21,20 @@ contract("TicketShop", async (accounts) => {
 
     it("should allow a new user to register as a buyer", async () =>{
         // Register accounts[2] as a buyer
-        await ts.registerBuyer({from: accounts[2]});
+        await ts.registerBuyer({from: unregistered});
 
         // Verify that the isBuyer status is set to true
-        let status = await ts.isBuyer(accounts[2]);
+        let status = await ts.isBuyer(unregistered);
         
         assert.equal(status, true);
     });
 
     it("should allow a new user to register as a seller", async () =>{
         // Register accounts[3] as a seller
-        await ts.registerSeller({from: accounts[3]});
+        await ts.registerSeller({from: unregistered});
 
         // Verify that the isSeller status is set to true
-        let status = await ts.isSeller(accounts[3]);
+        let status = await ts.isSeller(unregistered);
         
         assert.equal(status, true);
     });
@@ -40,19 +42,30 @@ contract("TicketShop", async (accounts) => {
 
     it("should allow a seller to create an event", async () => {
         // Create a new event as a seller
-        await ts.createEvent("test", 10, 100, {from: seller});
+        await ts.createEvent("test", price, supply, {from: seller});
 
         // Get the new event struct
         let newEvent = await ts.events(0);
 
         // Verify that the event name, price, and supply are equal to the seller's inputs
-        assert.equal(
-            newEvent.name, 
-            "test",
-            "The name of the event should be 'test'"
-            );
-        assert.equal(newEvent.price, 10);
-        assert.equal(newEvent.supply, 100);
+        assert.equal(newEvent.name, name, `The name of the event should be ${name}`);
+        assert.equal(newEvent.price, price, `Event price should be ${price}`);
+        assert.equal(newEvent.supply, supply, `Ticket supply should equal ${supply}`);
+    })
+
+    it("should not let a user create an event without being registered as a seller", async () => {
+        // Attempt to create a new event without being registered as a seller
+        try {
+            await ts.createEvent(name, price, supply, {from: unregistered});
+        } catch(err) {}
+
+        // Get the new event struct
+        let newEvent = await ts.events(0);
+                    
+        // Verify that the event name, price, and supply are unchanged
+        assert.equal(newEvent.name, "","The name of the event should be unchanged");
+        assert.equal(newEvent.price, 0, "The price of tickets should be unchanged");
+        assert.equal(newEvent.supply, 0, "The supply of tickets should be unchanged");
     })
 
     it("should allow a buyer to purchase a ticket from an event", async () => {
@@ -60,8 +73,8 @@ contract("TicketShop", async (accounts) => {
         await ts.createEvent("test", price, 100, {from: seller});
 
         // Get the buyer's and seller's balances before the transaction
-        let sellerBalanceBefore = web3.eth.getBalance(seller);
-        let buyerBalanceBefore = web3.eth.getBalance(buyer);
+        let sellerBalanceBefore = await web3.eth.getBalance(seller);
+        let buyerBalanceBefore = await web3.eth.getBalance(buyer);
 
         // Purchase a ticket as a buyer
         await ts.buyTicket(0, {value: excessAmount, from: buyer});
@@ -93,9 +106,10 @@ contract("TicketShop", async (accounts) => {
         // Verify that the seller has received the correct payment for the ticket
         assert.equal(
             new BN(sellerBalanceAfter).toString(),
-            new BN(sellerBalanceBefore).add(new BN(price)).toString(),
+            new BN(sellerBalanceBefore).add(new BN(price)),
             "The buyer's balance should be increased by the price of the ticket"
             );
+        
         
         // Verify that the buyer has payed the correct price for the ticket
         assert.isBelow(
@@ -103,6 +117,22 @@ contract("TicketShop", async (accounts) => {
             Number(new BN(buyerBalanceBefore).sub(new BN(price))),
             "The seller's balance should be reduced by more than the price of the ticket (including gas costs)"
             );
+
+    })
+
+    it("should not let a user purhcase a ticket if they're not registerd as a buyer", async () => {
+        // Create a new event as a seller
+        await ts.createEvent(name, price, supply, {from: seller});
+
+        // Attempt to purchase a ticket without being registered as a buyer
+        try {
+            await ts.buyTicket(0, {value: excessAmount, from: unregistered});
+        } catch(err) {}
+
+        // Get the number of tickets owned by the buyer
+        let owned = await ts.tickets(unregistered, 0); 
+        
+        assert.equal(owned, 0, "Tickets owned should equal 0");
 
     })
 })
