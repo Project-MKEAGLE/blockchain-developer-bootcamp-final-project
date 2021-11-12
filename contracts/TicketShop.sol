@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.4;
 
 contract TicketShop {
   address public owner;
@@ -8,6 +8,7 @@ contract TicketShop {
   // and allow the seller to set how long these phases can last, but decided to keep it simple for now
 
   struct Event{
+    uint id;
     string name;
     address payable seller;
     uint price;
@@ -18,13 +19,12 @@ contract TicketShop {
     bool soldOut;
   }
 
-  uint public eventCount;
+  Event[] public events;
 
   mapping (address => bool) public isBuyer;
   mapping (address => bool) public isSeller;
   mapping (address => uint) public balances;
-  mapping (uint => Event) public events;
-  mapping (address => mapping(uint => uint)) public tickets;
+  mapping (address => mapping(uint => bool)) public ticketOwned;
 
   event BuyerRegistered(address buyer, bool status);
   event SellerRegistered(address seller, bool status);
@@ -61,31 +61,30 @@ contract TicketShop {
 
   // Allows a seller to create an event
   function createEvent(string memory _name, uint _price, uint _supply) external onlySeller(msg.sender) {
-    events[eventCount] = Event({
-      name: _name,
-      seller: payable(msg.sender),
-      price: _price,
-      supply: _supply,
-      amountSold: 0,
-      saleStart: block.timestamp,
-      saleEnd: block.timestamp + 7 days,
-      soldOut: false
-    });
+    emit EventAdded(events.length, msg.sender);
 
-    emit EventAdded(eventCount, msg.sender);
-
-    eventCount++;
+    events.push(
+      Event(
+        events.length,
+        _name, payable(msg.sender), 
+        _price, _supply, 
+        0, 
+        block.timestamp, 
+        block.timestamp + 7 days, 
+        false
+      )
+    );    
   }
 
   // Allows a buyer to purchase a ticket
   // For now only allows a buyer to own 1 ticker per event
   function buyTicket(uint _eventId) external payable onlyBuyer(msg.sender){
-    require(tickets[msg.sender][_eventId] < 1, "You've already purchased a ticket");
+    require(ticketOwned[msg.sender][_eventId] == false, "You've already purchased a ticket");
     require(events[_eventId].soldOut == false, "This event is sold out");
     require(block.timestamp < events[_eventId].saleEnd, "This sale has closed");
     require(msg.value >= events[_eventId].price, "Insufficient transaction value");
 
-    tickets[msg.sender][_eventId] = 1;
+    ticketOwned[msg.sender][_eventId] = true;
 
     events[_eventId].amountSold++;
 
@@ -97,6 +96,14 @@ contract TicketShop {
       require(success, "Transfer failed.");
 
     emit TicketSold(_eventId, msg.sender, msg.value);
+  }
+
+  function getEvents() external view returns(Event[] memory) {
+    return events;
+  }
+
+  function getTicketOwned(address _owner, uint _eventId) external view returns(bool) {
+    return ticketOwned[_owner][_eventId];
   }
 }
 
