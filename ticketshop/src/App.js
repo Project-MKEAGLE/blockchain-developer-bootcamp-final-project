@@ -10,7 +10,6 @@ export default function App() {
   const [accounts, setAccounts] = useState(undefined)
   const [activeAccount, setActiveAccount] = useState("Not connected")
   const [events, setEvents] = useState([])
-  const [isBuyer, setIsBuyer] = useState(undefined)
   const [isSeller, setIsSeller] = useState(undefined)
   const [loading, setLoading] = useState(undefined)
 
@@ -21,7 +20,6 @@ export default function App() {
       const accounts = await web3.eth.getAccounts()
       const activeAccount = accounts[0]
       const events = await ts.methods.getEvents().call()
-      const isBuyer = await ts.methods.isBuyer(accounts[0]).call() 
       const isSeller = await ts.methods.isSeller(accounts[0]).call()
       
       setLoading(true)
@@ -30,16 +28,11 @@ export default function App() {
       setAccounts(accounts)
       setActiveAccount(activeAccount)
       setEvents(events)
-      setIsBuyer(isBuyer)
       setIsSeller(isSeller)
       setLoading(false)
     }
     init()
   }, [])
-
-  const registerBuyer = () => {
-    ts.methods.registerBuyer().send({from: accounts[0]})
-  }
 
   const registerSeller = () => {
     ts.methods.registerSeller().send({from: accounts[0]})
@@ -56,13 +49,17 @@ export default function App() {
   }
 
   const buyTicket = (eventId) => {
+    setLoading(true)
     ts.methods.buyTicket(eventId)
       .send({from: accounts[0], value: events[eventId].price})
-      .then(console.log(ticketOwned(accounts[0], eventId)))
+      .on('transactionHash', (hash) => {
+        setLoading(false)
+      })
   }
 
   const ticketOwned = (address, eventId) => {
     ts.methods.getTicketOwned(address, eventId).call().toString()
+    
   }
 
 
@@ -75,9 +72,7 @@ export default function App() {
         ? <div id="loader"><p>Loading...</p></div>
         : <div>
             <Register
-              registerBuyer={registerBuyer}
               registerSeller={registerSeller}
-              isBuyer={isBuyer}
               isSeller={isSeller}
             />
             {isSeller

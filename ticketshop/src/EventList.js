@@ -33,13 +33,15 @@ export default function EventList({events, activeAccount, buyTicket, web3, ticke
                         <td>
                             {newEvent.soldOut
                             ? "Sold Out!"
-                            : <button onClick={() => {
-                                    buyTicket(newEvent.id) 
-                                    console.log(ticketOwned(activeAccount, newEvent.id))
-                                }}
-                              >
+                            : ticketOwned(activeAccount, newEvent.id)
+                                ? "Purchased"
+                                : <button onClick={() => {
+                                        buyTicket(newEvent.id) 
+                                        console.log(ticketOwned(activeAccount, newEvent.id))
+                                    }}
+                                  >
                                     Buy Now
-                              </button>
+                                  </button>
                             }
                         </td>
                     </tr>
