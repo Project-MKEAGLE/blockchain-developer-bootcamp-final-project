@@ -15,19 +15,8 @@ contract("TicketShop", async (accounts) => {
         ts = await TicketShop.new();
         
         // Set accounts at index 0 and 1 to buyer and seller for future tests
-        await ts.registerBuyer({from: buyer});
         await ts.registerSeller({from: seller});
       });
-
-    it("should allow a new user to register as a buyer", async () =>{
-        // Register accounts[2] as a buyer
-        await ts.registerBuyer({from: unregistered});
-
-        // Verify that the isBuyer status is set to true
-        let status = await ts.isBuyer(unregistered);
-        
-        assert.equal(status, true);
-    });
 
     it("should allow a new user to register as a seller", async () =>{
         // Register accounts[3] as a seller
@@ -68,7 +57,7 @@ contract("TicketShop", async (accounts) => {
         assert.equal(newEvent.supply, 0, "The supply of tickets should be unchanged");
     })
 
-    it("should allow a buyer to purchase a ticket from an event", async () => {
+    it("should allow a user to purchase a ticket from an event", async () => {
         // Create a new event as a seller
         await ts.createEvent("test", price, 100, {from: seller});
 
@@ -82,8 +71,8 @@ contract("TicketShop", async (accounts) => {
         // Get the event's values after the purchase
         let newEvent = await ts.events(0);
 
-        // Get the number of tickets owned by the buyer
-        let owned = await ts.tickets(buyer, 0);
+        // Get the ownership status
+        let owned = await ts.ticketOwned(buyer, 0);
 
         // Get the buyer's and seller's balances after the transaction
         let sellerBalanceAfter = await web3.eth.getBalance(seller);
@@ -120,19 +109,25 @@ contract("TicketShop", async (accounts) => {
 
     })
 
-    it("should not let a user purhcase a ticket if they're not registerd as a buyer", async () => {
+    it("should not let a user purchase a second ticket", async () => {
         // Create a new event as a seller
-        await ts.createEvent(name, price, supply, {from: seller});
+        await ts.createEvent("test", price, 100, {from: seller});
 
-        // Attempt to purchase a ticket without being registered as a buyer
+        // Purchase a ticket as a buyer
+        await ts.buyTicket(0, {value: excessAmount, from: buyer});
+
+        // Try to purchase a second ticket
         try {
-            await ts.buyTicket(0, {value: excessAmount, from: unregistered});
+            await ts.buyTicket(0, {value: excessAmount, from: buyer});
         } catch(err) {}
 
-        // Get the number of tickets owned by the buyer
-        let owned = await ts.tickets(unregistered, 0); 
-        
-        assert.equal(owned, 0, "Tickets owned should equal 0");
+        // Get the ownership status
+        let owned = await ts.ticketOwned(buyer, 0);
 
+        assert.equal(
+            owned, 
+            1,
+            "The number of tickets owned by the buyer should be equal to 1"
+        );
     })
 })

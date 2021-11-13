@@ -25,11 +25,12 @@ contract TicketShop {
     bool soldOut;
   }
 
-  Event[] public events;
+  Event[] public eventList;
 
   mapping (address => bool) public isSeller;
   mapping (address => uint) public balances;
   mapping (address => mapping(uint => bool)) public ticketOwned;
+  mapping (uint => Event) public events;
 
   event SellerRegistered(address seller, bool status);
   event EventAdded(uint eventId, address seller);
@@ -55,19 +56,21 @@ contract TicketShop {
   /// @notice Allows a seller to create an event
   /// @dev Events are added to an array of events
   function createEvent(string memory _name, uint _price, uint _supply) external onlySeller(msg.sender) {
-    emit EventAdded(events.length, msg.sender);
+    emit EventAdded(eventList.length, msg.sender);
 
-    events.push(
-      Event(
-        events.length,
-        _name, payable(msg.sender), 
-        _price, _supply, 
-        0, 
-        block.timestamp, 
-        block.timestamp + 7 days, 
-        false
-      )
-    );    
+    events[eventList.length] = Event(
+      eventList.length,
+      _name, 
+      payable(msg.sender), 
+      _price, 
+      _supply, 
+      0, 
+      block.timestamp, 
+      block.timestamp + 7 days, 
+      false
+    );
+
+    eventList.push(events[eventList.length]);    
   }
 
   /// @notice Allows a user to purchase a ticket
@@ -95,7 +98,7 @@ contract TicketShop {
   /// @notice Retrieve all events
   /// @return An array of Event structs
   function getEvents() external view returns(Event[] memory) {
-    return events;
+    return eventList;
   }
 
   /// @notice Sees if a user is an owner of a ticket for an event
