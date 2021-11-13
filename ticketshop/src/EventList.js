@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-export default function EventList({events, activeAccount, buyTicket, web3, ticketOwned}) {
+export default function EventList({events, activeAccount, buyTicket, web3, ticketOwned, isPaused}) {
         
     return (
         <div>
@@ -37,10 +37,11 @@ export default function EventList({events, activeAccount, buyTicket, web3, ticke
                                 ? "Purchased"
                                 : <button onClick={() => {
                                         buyTicket(newEvent.id) 
-                                        console.log(ticketOwned(activeAccount, newEvent.id))
+                                        console.log(typeof ticketOwned(activeAccount, newEvent.id))
                                     }}
+                                    disabled={isPaused}
                                   >
-                                    Buy Now
+                                    {isPaused ? "Contract paused" : "Buy Now"}
                                   </button>
                             }
                         </td>

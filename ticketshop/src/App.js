@@ -9,8 +9,10 @@ export default function App() {
   const [ts, setTs] = useState(undefined)
   const [accounts, setAccounts] = useState(undefined)
   const [activeAccount, setActiveAccount] = useState("Not connected")
+  const [owner, setOwner] = useState(undefined)
   const [events, setEvents] = useState([])
   const [isSeller, setIsSeller] = useState(undefined)
+  const [isPaused, setPaused] = useState(undefined)
   const [loading, setLoading] = useState(undefined)
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export default function App() {
       const ts = await getTicketShop(web3)
       const accounts = await web3.eth.getAccounts()
       const activeAccount = accounts[0]
+      const owner = await ts.methods.owner().call()
       const events = await ts.methods.getEvents().call()
       const isSeller = await ts.methods.isSeller(accounts[0]).call()
       
@@ -27,16 +30,34 @@ export default function App() {
       setTs(ts)
       setAccounts(accounts)
       setActiveAccount(activeAccount)
+      setOwner(owner)
       setEvents(events)
       setIsSeller(isSeller)
+      setPaused(false)
       setLoading(false)
     }
     init()
   }, [])
 
+  const pause = async () => {
+    setLoading(true)
+    ts.methods.pause().send({from: accounts[0]})
+    .on('transactionHash', (hash) => {
+      setPaused(true)
+    }).then(setLoading(false))
+  }
+
+  const unpause = async () => {
+    setLoading(true)
+    ts.methods.unpause().send({from: accounts[0]})
+    .on('transactionHash', (hash) => {
+      setPaused(false)
+    }).then(setLoading(false))
+  }
+
   const registerSeller = () => {
     ts.methods.registerSeller().send({from: accounts[0]})
-
+    .then(window.location.reload(true))
   }
   
   const createEvent = (newEvent) => {
@@ -67,7 +88,17 @@ export default function App() {
   return (
     <div className="App">
       <h1>Ticket Shop</h1>
-      {activeAccount}
+      <div>{activeAccount}</div>
+      {activeAccount === owner
+        ? <button onClick={() =>{
+            {isPaused ? unpause() : pause()}
+          }}
+          >
+            {isPaused ? "Unpause" : "Pause"}
+          </button>
+        : null
+      }
+      
       {loading 
         ? <div id="loader"><p>Loading...</p></div>
         : <div>
@@ -76,10 +107,11 @@ export default function App() {
               isSeller={isSeller}
             />
             {isSeller
-              ?
-                <CreateEvent
-                createEvent={createEvent}
-                />
+              ? isPaused 
+                ? "Contract paused"
+                : <CreateEvent
+                    createEvent={createEvent}
+                  />
               : null
             }
             
@@ -89,6 +121,7 @@ export default function App() {
               buyTicket={buyTicket}
               web3={web3}
               ticketOwned={ticketOwned}
+              isPaused={isPaused}
             />
           </div>
       }

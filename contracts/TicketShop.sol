@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.4;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/security/Pausable.sol';
+
   /// @title An event ticket marketplace
   /** @notice This contract allows users to create events and sell tickets to other users.
-      Ideally each ticket would be an NFT, but to keep it simple, tickets are just tracked in the Event struct
+    * Ideally each ticket would be an NFT, but to keep it simple, tickets are just tracked in the Event struct
   */
 
-contract TicketShop {
-  address public owner;
+contract TicketShop is Ownable, Pausable {
 
   /** @dev Using an enum to add phases to the ticket sale (presale, public sale, sale over, etc)
-      and allow the seller to set how long these phases can last can give the seller more control, 
-      but decided to keep it simple for now
+    * and allow the seller to set how long these phases can last can give the seller more control, 
+    * but decided to keep it simple for now
   */
   struct Event{
     uint id;
@@ -44,6 +46,14 @@ contract TicketShop {
     _;
   }
 
+  function pause() external onlyOwner() {
+    _pause();
+  }
+
+  function unpause() external onlyOwner() {
+    _unpause();
+  }
+
   /// @notice Registers the user as a seller
   function registerSeller() external {
     require(isSeller[msg.sender] != true, "Already registered");
@@ -74,8 +84,10 @@ contract TicketShop {
   }
 
   /// @notice Allows a user to purchase a ticket
-  /// @dev For now only allows a buyer to own 1 ticker per event
-  function buyTicket(uint _eventId) external payable {
+  /**  @dev For now only allows a buyer to own 1 ticker per event
+    *  Contract must not be paused
+  */
+  function buyTicket(uint _eventId) external payable whenNotPaused() {
     require(ticketOwned[msg.sender][_eventId] == false, "You've already purchased a ticket");
     require(events[_eventId].soldOut == false, "This event is sold out");
     require(block.timestamp < events[_eventId].saleEnd, "This sale has closed");
