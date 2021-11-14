@@ -1,2 +1,2 @@
-Address:
-Network:
+Address: 0xAC3CDdb5DE5CcAf079d7e5342F1593E4956A5D27
+Network: Ropsten
