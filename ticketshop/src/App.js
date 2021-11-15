@@ -90,12 +90,14 @@ export default function App() {
       <h1>Ticket Shop</h1>
       <div>{activeAccount}</div>
       {activeAccount === owner
-        ? <button onClick={() =>{
-            {isPaused ? unpause() : pause()}
-          }}
-          >
-            {isPaused ? "Unpause" : "Pause"}
-          </button>
+        ? <div> 
+            <button onClick={() =>{
+              {isPaused ? unpause() : pause()}
+            }}
+            >
+              {isPaused ? "Unpause" : "Pause"}
+            </button>
+          </div>
         : null
       }
       
