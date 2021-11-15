@@ -90,18 +90,13 @@ export default function App() {
       <h1>Ticket Shop</h1>
       <div>{activeAccount}</div>
       {activeAccount === owner
-        ? <div> 
-            <button onClick={() =>{
-              {isPaused ? unpause() : pause()}
-            }}
-            >
+        ? <button onClick={() => isPaused ? unpause() : pause()}>
               {isPaused ? "Unpause" : "Pause"}
-            </button>
-          </div>
+          </button>
         : null
       }
       
-      {loading 
+      {loading
         ? <div id="loader"><p>Loading...</p></div>
         : <div>
             <Register
@@ -117,14 +112,17 @@ export default function App() {
               : null
             }
             
-            <EventList
-              events={events}
-              activeAccount={activeAccount}
-              buyTicket={buyTicket}
-              web3={web3}
-              ticketOwned={ticketOwned}
-              isPaused={isPaused}
-            />
+            {events.length > 0 
+            ? <EventList
+                events={events}
+                activeAccount={activeAccount}
+                buyTicket={buyTicket}
+                web3={web3}
+                ticketOwned={ticketOwned}
+                isPaused={isPaused}
+              />
+            : null
+            }
           </div>
       }
     </div>
