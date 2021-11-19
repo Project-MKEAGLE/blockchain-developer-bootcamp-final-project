@@ -28,6 +28,7 @@ contract TicketShop is Ownable, Pausable {
   }
 
   Event[] public eventList;
+  uint eventCount;
 
   mapping (address => bool) public isSeller;
   mapping (address => uint) public balances;
@@ -80,7 +81,9 @@ contract TicketShop is Ownable, Pausable {
       false
     );
 
-    eventList.push(events[eventList.length]);    
+    eventList.push(events[eventList.length]);   
+
+    eventCount++; 
   }
 
   /// @notice Allows a user to purchase a ticket
@@ -115,8 +118,9 @@ contract TicketShop is Ownable, Pausable {
 
   /// @notice Sees if a user is an owner of a ticket for an event
   /// @return Boolean value representing ticket ownership
-  function getTicketOwned(address _owner, uint _eventId) external view returns(bool) {
-    return ticketOwned[_owner][_eventId];
+  /// unused
+  function getTicketOwned(uint _eventId) external view returns(bool) {
+    return ticketOwned[msg.sender][_eventId];
   }
 }
 

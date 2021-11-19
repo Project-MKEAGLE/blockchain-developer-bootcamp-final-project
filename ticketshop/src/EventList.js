@@ -1,7 +1,7 @@
 import React from 'react'
 
 
-export default function EventList({events, activeAccount, buyTicket, web3, ticketOwned, isPaused}) {
+export default function EventList({events, buyTicket, web3, isPaused, getTicketOwned}) {
         
     return (
         <div>
@@ -11,7 +11,6 @@ export default function EventList({events, activeAccount, buyTicket, web3, ticke
                     <tr>
                         <th>Event</th>
                         <th>Price</th>
-                        <th>Tickets Left</th>
                         <th>Sale End</th>
                         <th>Purchase Ticket</th>
                     </tr>
@@ -22,7 +21,6 @@ export default function EventList({events, activeAccount, buyTicket, web3, ticke
                     <tr key={newEvent.id}>
                         <td>{newEvent.name}</td>
                         <td>{web3.utils.fromWei(newEvent.price)} ETH</td>
-                        <td>{newEvent.supply - newEvent.amountSold}</td>
                         <td>{new Intl.DateTimeFormat("en-GB", {
                                 year: "numeric",
                                 month: "short",
@@ -31,22 +29,11 @@ export default function EventList({events, activeAccount, buyTicket, web3, ticke
                             }
                         </td>
                         <td>
-                            {newEvent.soldOut
-                            ? "Sold Out!"
-                            : ticketOwned(activeAccount, newEvent.id)
-                                ? "Purchased"
-                                : <button onClick={() => {
-                                        buyTicket(newEvent.id) 
-                                        console.log(typeof ticketOwned(activeAccount, newEvent.id))
-                                    }}
-                                    disabled={isPaused}
-                                  >
+                            <button onClick={() => {buyTicket(newEvent.id)}} disabled={isPaused}>
                                     {isPaused ? "Contract paused" : "Buy Now"}
-                                  </button>
-                            }
+                            </button>
                         </td>
                     </tr>
-                    
                 ))}
             </tbody>
 

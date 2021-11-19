@@ -78,17 +78,18 @@ export default function App() {
       })
   }
 
-  const ticketOwned = (address, eventId) => {
-    ts.methods.getTicketOwned(address, eventId).call().toString()
-    
+  // unused
+  const getTicketOwned = (account, eventId) => {
+    ts.methods.ticketOwned(account, eventId).call()
   }
-
-
   
   return (
     <div className="App">
+
       <h1>Ticket Shop</h1>
-      <div>{activeAccount}</div>
+
+      {activeAccount}
+
       {activeAccount === owner
         ? <button onClick={() => isPaused ? unpause() : pause()}>
               {isPaused ? "Unpause" : "Pause"}
@@ -116,9 +117,9 @@ export default function App() {
             ? <EventList
                 events={events}
                 activeAccount={activeAccount}
+                getTicketOwned={getTicketOwned} //unused
                 buyTicket={buyTicket}
                 web3={web3}
-                ticketOwned={ticketOwned}
                 isPaused={isPaused}
               />
             : null
