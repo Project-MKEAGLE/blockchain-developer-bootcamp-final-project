@@ -1,6 +1,9 @@
 # Ticket Shop
 
+## Links
 Video Walkthrough: https://www.loom.com/share/915668655b184abcab08b61bb075fb13
+
+Netlify URL: https://dreamy-booth-efbd86.netlify.app/
 
 ## About
 Ticket Shop is a very basic dApp that is designed to demonstrate learnings in the Consensys Academy Blockchain Developer Bootcamp.
