@@ -21274,10 +21274,119 @@
   },
   "networks": {
     "3": {
-      "events": {},
+      "events": {
+        "0x22c8faed5969a6808c4706a759d88cc07001fda4c7a81eef86f3f44999116148": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "eventId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            }
+          ],
+          "name": "EventAdded",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        "0x62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a258": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "Paused",
+          "type": "event"
+        },
+        "0x3860b75e2fd87bc4bd8b62bb4c55616156cf8660108bfe650183fdf40cb29235": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "seller",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "status",
+              "type": "bool"
+            }
+          ],
+          "name": "SellerRegistered",
+          "type": "event"
+        },
+        "0xbce6612c87f6b5711225ffc4b9f920148cd399de49ba10137fe0d3c531333841": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "eventId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyer",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "TicketSold",
+          "type": "event"
+        },
+        "0x5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "Unpaused",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0xAC3CDdb5DE5CcAf079d7e5342F1593E4956A5D27",
-      "transactionHash": "0x03b6f6825024ca762a4513bbdc6b3620de05d68d024a0c3c9fe4085df34e4562"
+      "address": "0x1024B965CF65EB554405aD57068c8D94Df6243A1",
+      "transactionHash": "0xf2f2c7ed071b708df71372f19f6c9032faf31ec43cf8167b2ce5f9eacdceea62"
     },
     "5777": {
       "events": {
@@ -21396,7 +21505,7 @@
     }
   },
   "schemaVersion": "3.4.1",
-  "updatedAt": "2021-11-19T16:51:20.310Z",
+  "updatedAt": "2021-11-19T17:17:04.348Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
