@@ -2,7 +2,7 @@ import React from 'react'
 
 
 export default function EventList({events, buyTicket, web3, isPaused, getTicketOwned}) {
-        
+
     return (
         <div>
             <h2>Events</h2>
@@ -11,6 +11,7 @@ export default function EventList({events, buyTicket, web3, isPaused, getTicketO
                     <tr>
                         <th>Event</th>
                         <th>Price</th>
+                        <th>Tickets Available</th>
                         <th>Sale End</th>
                         <th>Purchase Ticket</th>
                     </tr>
@@ -21,6 +22,7 @@ export default function EventList({events, buyTicket, web3, isPaused, getTicketO
                     <tr key={newEvent.id}>
                         <td>{newEvent.name}</td>
                         <td>{web3.utils.fromWei(newEvent.price)} ETH</td>
+                        <td>{newEvent.supply - newEvent.amountSold}</td>
                         <td>{new Intl.DateTimeFormat("en-GB", {
                                 year: "numeric",
                                 month: "short",
@@ -29,7 +31,7 @@ export default function EventList({events, buyTicket, web3, isPaused, getTicketO
                             }
                         </td>
                         <td>
-                            <button onClick={() => {buyTicket(newEvent.id)}} disabled={isPaused}>
+                            <button onClick={async () => {buyTicket(newEvent.id)}} disabled={isPaused}>
                                     {isPaused ? "Contract paused" : "Buy Now"}
                             </button>
                         </td>

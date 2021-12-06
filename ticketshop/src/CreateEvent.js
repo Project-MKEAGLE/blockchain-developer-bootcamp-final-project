@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 export default function CreateEvent({createEvent}) {
     const [newEvent, setNewEvent] = useState(undefined)
+    const [eventsCreated, setEventsCreated] = useState(undefined)
 
     const updateEvent = (e, field) => {
         const value = e.target.value
@@ -14,6 +15,7 @@ export default function CreateEvent({createEvent}) {
             <form onSubmit={(e) => {
                 e.preventDefault()
                 createEvent(newEvent)
+                setEventsCreated(eventsCreated + 1)
             }}>
                 <label htmlFor="eventName">Event</label>
                 <input
